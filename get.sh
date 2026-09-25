@@ -36,7 +36,9 @@ for tool in curl tar sha256sum; do command -v "$tool" >/dev/null || die "$tool i
 printf '\n%sMITVARIS website installer%s\n\n' "$B" "$N"
 
 # --- Sign-in: from the environment, an existing install, or the operator ----
-setting() { grep -E "^$1=" "$2" 2>/dev/null | tail -1 | cut -d= -f2- | sed "s/^'//; s/'\$//" ; }
+# `|| true`: on a new server there is no .env yet, grep exits 2, and under
+# pipefail that would end the script before its first question.
+setting() { grep -E "^$1=" "$2" 2>/dev/null | tail -1 | cut -d= -f2- | sed "s/^'//; s/'\$//" || true; }
 user="${REGISTRY_USERNAME:-$(setting REGISTRY_USERNAME "$DIR/.env")}"
 token="${REGISTRY_TOKEN:-$(setting REGISTRY_TOKEN "$DIR/.env")}"
 if [ -z "$token" ]; then
